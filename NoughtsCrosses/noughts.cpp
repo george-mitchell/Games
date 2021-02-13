@@ -118,178 +118,97 @@ int GamePlay (const char player1, const char player2, const string name1, const 
     int winner {};
 
 
-    if (name2 != "TuRiNg")
+    do
     {
-        do
+        if (PlayerTurn == 1)
         {
-            if (PlayerTurn == 1)
+            int pos {};
+            cout << name1 << ": ";
+            cin >> pos; 
+            if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
             {
-                int pos {};
-                cout << name1 << ": ";
-                cin >> pos; 
-                if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
+                Player1Turns.at(pos-1) = 1;
+                GameState.at(pos-1) = player1;
+                if(PlayerWon(Player1Turns))
                 {
-                    Player1Turns.at(pos-1) = 1; 
-                    if(PlayerWon(Player1Turns))
-                    {
-                        GameOver = true;
-                        winner = 1;
-                        break;
-                    }
-                    
-                    //update game board
-                    GameState.at(pos-1) = player1; 
-
-                    // check that there are still moves available
-                    int count {0};
-                    for (auto x: GameState)
-                    {
-                        if (x == 'U')
-                        {
-                            count = count + 1; 
-                        }
-                    }
-                    if ( count != 0)
-                    {
-                        DisplayBoard(GameState);
-                        PlayerTurn = 2;
-                    }
-                    else
-                    {
-                        winner = 3; 
-                        break;
-                    }
-                    
+                    GameOver = true;
+                    winner = 1;
+                    DisplayBoard(GameState);
+                    break;
                 }
-            }
 
-            if (PlayerTurn == 2)
+                // check that there are still moves available
+                int count {0};
+                for (auto x: GameState)
+                {
+                    if (x == 'U')
+                    {
+                        count = count + 1; 
+                    }
+                }
+                if ( count != 0)
+                {
+                    DisplayBoard(GameState);
+                    PlayerTurn = 2;
+                }
+                else
+                {
+                    winner = 3; 
+                    DisplayBoard(GameState);
+                    break;
+                }
+                
+            }
+        }
+
+        if (PlayerTurn == 2)
+        {
+            int pos {};
+            if (name2 == "TuRiNg")
             {
-                int pos {};
+                pos = (rand() % 9) + 1;
+            }
+            else if (name2 != "TuRiNg")
+            {
                 cout << name2 << ": ";
                 cin >> pos; 
-                if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
-                {
-                    Player2Turns.at(pos-1) = 1; 
-                    if(PlayerWon(Player2Turns))
-                    {
-                        GameOver = true;
-                        winner = 2;
-                        break;
-                    }
-                    
-                    GameState.at(pos-1) = player2; 
-                    int count {0};
-                    for (auto x: GameState)
-                    {
-                        if (x == 'U')
-                        {
-                            count = count + 1; 
-                        }
-                    }
-                    if ( count != 0)
-                    {
-                        DisplayBoard(GameState);
-                        PlayerTurn = 1;
-                    }
-                    else
-                    {
-                        winner = 3; 
-                        break;
-                    }
-                }
             }
 
-
-
-        } while (!GameOver);
-    }
-    else
-    {
-        do
-        {
-            if (PlayerTurn == 1)
+            if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
             {
-                int pos {};
-                cout << name1 << ": ";
-                cin >> pos; 
-                if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
+                Player2Turns.at(pos-1) = 1;
+                GameState.at(pos-1) = player2; 
+                if(PlayerWon(Player2Turns))
                 {
-                    Player1Turns.at(pos-1) = 1; 
-                    if(PlayerWon(Player1Turns))
-                    {
-                        GameOver = true;
-                        winner = 1;
-                        break;
-                    }
-                    
-                    //update game board
-                    GameState.at(pos-1) = player1; 
-
-                    // check that there are still moves available
-                    int count {0};
-                    for (auto x: GameState)
-                    {
-                        if (x == 'U')
-                        {
-                            count = count + 1; 
-                        }
-                    }
-                    if ( count != 0)
-                    {
-                        DisplayBoard(GameState);
-                        PlayerTurn = 2;
-                    }
-                    else
-                    {
-                        winner = 3; 
-                        break;
-                    }
-                    
+                    GameOver = true;
+                    winner = 2;
+                    DisplayBoard(GameState);
+                    break;
                 }
-            }
-
-            if (PlayerTurn == 2)
-            {
-                int pos { (rand() % 9) + 1};
-                if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
+                
+                int count {0};
+                for (auto x: GameState)
                 {
-                    Player2Turns.at(pos-1) = 1; 
-                    if(PlayerWon(Player2Turns))
+                    if (x == 'U')
                     {
-                        GameOver = true;
-                        winner = 2;
-                        break;
-                    }
-                    
-                    GameState.at(pos-1) = player2; 
-                    int count {0};
-                    for (auto x: GameState)
-                    {
-                        if (x == 'U')
-                        {
-                            count = count + 1; 
-                        }
-                    }
-                    if ( count != 0)
-                    {
-                        DisplayBoard(GameState);
-                        PlayerTurn = 1;
-                    }
-                    else
-                    {
-                        winner = 3; 
-                        break;
+                        count = count + 1; 
                     }
                 }
+                if ( count != 0)
+                {
+                    DisplayBoard(GameState);
+                    PlayerTurn = 1;
+                }
+                else
+                {
+                    winner = 3; 
+                    DisplayBoard(GameState);
+                    break;
+                }
             }
+        }
 
-
-
-        } while (!GameOver);
-    }
-
-
+    } while (!GameOver);
 
     return winner;
     
