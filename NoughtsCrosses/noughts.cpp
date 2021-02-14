@@ -5,6 +5,17 @@
 
 using namespace std;
 
+long long int Exponent (const int base, const int expo)
+{
+    long long int result {1};
+    for(int i {1}; i <= expo; i++)
+    {
+        result = result * base; 
+    }
+
+    return result;
+}
+
 int BeginPlay()
 {
     cout << "\nNoughts and Crosses Game" << endl;
@@ -108,7 +119,175 @@ bool PlayerWon (vector <int> PlayerTurns)
     return false;
 }
 
-int GamePlay (const char player1, const char player2, const string name1, const string name2)
+int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <char> GameState, const int Difficulty, const char player1, const char player2)
+{
+    vector <int> NewPlayer1Turns {Player1Turns};
+    for (int i {1}; i <= 9; ++i)
+    {
+        NewPlayer1Turns.at(i-1) = 1;
+        if (PlayerWon(NewPlayer1Turns) && GameState.at(i-1) == 'U')
+        {
+            return i;
+        }
+        else
+        {
+            NewPlayer1Turns = Player1Turns; 
+        }
+    }
+
+
+    // Computer runs simulation of game
+    vector <vector <int>> Trials {}; 
+    long long int NumberOfTrials {Exponent(10, (Difficulty +2))}; 
+    bool GameOver {false}; 
+    vector <char> NewGameState = GameState;
+    vector <int> NewPlayer2Turns = Player2Turns;
+    vector <int> TrialStages (2); 
+    long long int debug {0};
+    long long int debug2 {0}; 
+
+    for (long long int i {1}; i <= NumberOfTrials; ++i)
+    {
+        int PlayerTurn {2};
+        int FirstMove {1};
+        TrialStages = {0,0}; 
+        NewGameState = GameState; 
+        NewPlayer1Turns = Player1Turns; 
+        NewPlayer2Turns = Player2Turns;
+        do
+        {
+            if (PlayerTurn == 2)
+            {
+                int pos {(rand() % 9 + 1)};
+
+                if (NewGameState.at(pos-1) == 'U')
+                {
+                    if (FirstMove == 1)
+                    {
+                        FirstMove = 2; 
+                        TrialStages.at(0) = pos;
+                        TrialStages.at(1) = 0; 
+                        Trials.push_back(TrialStages);
+                    }
+                    NewGameState.at(pos-1) = player2; 
+                    NewPlayer2Turns.at(pos-1) = 1;
+                    if (PlayerWon(NewPlayer2Turns))
+                    {
+                        GameOver = true;
+                        debug = debug + 1;              // DEBUG LINE
+                        Trials.at(i-1).at(1) = 1;
+                        break;
+                    }
+                    int count {0};
+                    for (auto x: NewGameState)
+                    {
+                        if (x == 'U')
+                        {
+                            count = count + 1; 
+                        }
+                    }
+                    if ( count != 0)
+                    {
+                        PlayerTurn = 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+            }
+
+            if (PlayerTurn = 1)
+            {
+                int pos {rand() % 9 + 1};
+
+                if (NewGameState.at(pos-1) == 'U')
+                {
+                    NewGameState.at(pos-1) = player1;
+                    NewPlayer1Turns.at(pos-1) = 1; 
+                    if (PlayerWon(NewPlayer1Turns))
+                    {
+                        debug2 = debug2 + 1;            // DEBUG LINE
+                        GameOver = true;
+                        break;
+                    }
+                    int count {0};
+                    for (auto x: NewGameState)
+                    {
+                        if (x == 'U')
+                        {
+                            count = count + 1; 
+                        }
+                    }
+                    if ( count != 0)
+                    {
+                        PlayerTurn = 2;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+        } while (!GameOver);
+    }
+
+    cout << "debug: " << debug << endl; 
+    cout << "debug2: " << debug2 << endl; 
+
+    // Collect those first moves which led to a win
+    vector <int> BestMove {}; 
+    for (long long int i {0}; i < Trials.size(); i++)
+    {
+        if( Trials.at(i).at(1) == 1)
+        {
+            BestMove.push_back(Trials.at(i).at(0));
+        }
+    }
+
+    if (BestMove.size() != 0)
+    {
+        cout << "Number of Best moves: " << BestMove.size() << endl;       // DEBUG LINE
+        // Find which first move that lead to a win appeared the most
+        vector <int> BestMoveFreq (9); 
+        for ( int i {1}; i <= 9; i++)
+        {
+            int count {0}; 
+            for (auto num: BestMove)
+            {
+                if (num == i)
+                {
+                    count = count + 1;
+                }
+            }
+            BestMoveFreq.at(i-1) = count;
+        } 
+
+        int BestPos {BestMoveFreq.at(0)};
+        for (auto num: BestMoveFreq)
+        {
+            if (num >= BestPos)
+            {
+                BestPos = num;
+            }
+        }
+        for ( int i {0}; i < 9; ++i)
+        {
+            if (BestPos == BestMoveFreq.at(i))
+            {
+                return (i + 1);
+            }
+        }
+    }
+        
+    return ((rand() % 9) + 1);
+
+
+}
+
+int GamePlay (const char player1, const char player2, const string name1, const string name2, const int Difficulty)
 {
     int PlayerTurn {1}; 
     vector <int> Player1Turns (9); 
@@ -166,7 +345,7 @@ int GamePlay (const char player1, const char player2, const string name1, const 
             int pos {};
             if (name2 == "TuRiNg")
             {
-                pos = (rand() % 9) + 1;
+                pos = AIDecision(Player1Turns, Player2Turns, GameState, Difficulty, player1, player2);
             }
             else if (name2 != "TuRiNg")
             {
@@ -249,10 +428,15 @@ void Noughts (const int players)
         }
 
         cout << endl;
+        cout << "Select Difficulty (1-Easy, 2-Medium, 3-Hard): ";
+        int Difficulty {1}; 
+        cin >> Difficulty; 
+
+        cout << endl;
         cout << "Let's play!" << endl;
         cout << "=====================" << endl; 
 
-        winner = GamePlay(player1, player2, name, "TuRiNg"); 
+        winner = GamePlay(player1, player2, name, "TuRiNg", Difficulty); 
 
         if (winner == 1)
         {
@@ -308,7 +492,7 @@ void Noughts (const int players)
         cout << "Let's play!" << endl;
         cout << "=====================" << endl; 
 
-        winner = GamePlay(player1, player2, name1, name2); 
+        winner = GamePlay(player1, player2, name1, name2, 1); 
 
         if (winner == 1)
         {
