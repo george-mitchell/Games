@@ -119,8 +119,59 @@ bool PlayerWon (vector <int> PlayerTurns)
     return false;
 }
 
+int Chooser (vector <int> Spaces, vector <char> GameState)
+{
+    srand(time(NULL));
+    bool LoopStop {false};
+    do
+    {
+        if (Spaces.size() != 0)
+        {
+            int pos {Spaces.at(rand() % Spaces.size())}; 
+            if (GameState.at(pos-1) == 'U')
+            {
+                return pos;
+            }
+            else
+            {
+                for (int i {0}; i < Spaces.size(); ++i)
+                {
+                    if (Spaces.at(i) == pos)
+                    {
+                        Spaces.erase(Spaces.begin() + i);
+                    }
+                }
+            }
+        }
+        else
+        {
+            LoopStop = true;
+        }
+
+    } while (!LoopStop);
+
+    return 0;
+}
+
 int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <char> GameState, const int Difficulty, const char player1, const char player2)
 {
+    srand(time(NULL));
+    // Win if possible
+    vector <int> NewPlayer2Turns {Player2Turns}; 
+    for (int i {1}; i <= 9; ++i)
+    {
+        NewPlayer2Turns.at(i-1) = 1;
+        if (PlayerWon(NewPlayer2Turns) && GameState.at(i-1) == 'U')
+        {
+            return i;
+        }
+        else
+        {
+            NewPlayer2Turns = Player2Turns; 
+        }
+    }
+
+    // Prevent Loss
     vector <int> NewPlayer1Turns {Player1Turns};
     for (int i {1}; i <= 9; ++i)
     {
@@ -135,168 +186,82 @@ int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <ch
         }
     }
 
-
-    // Computer runs simulation of game
-    vector <vector <int>> Trials {}; 
-    long long int NumberOfTrials {Exponent(10, (Difficulty +2))}; 
-    bool GameOver {false}; 
-    vector <char> NewGameState = GameState;
-    vector <int> NewPlayer2Turns = Player2Turns;
-    vector <int> TrialStages (2); 
-    long long int debug {0};
-    long long int debug2 {0}; 
-
-    for (long long int i {1}; i <= NumberOfTrials; ++i)
+    if (Difficulty >= 3)
     {
-        int PlayerTurn {2};
-        int FirstMove {1};
-        TrialStages = {0,0}; 
-        NewGameState = GameState; 
-        NewPlayer1Turns = Player1Turns; 
-        NewPlayer2Turns = Player2Turns;
-        do
+        // Choose moves tactically
+        if (GameState.at(0) == player1)
         {
-            if (PlayerTurn == 2)
+            vector <int> Diags {2,4,5};
+            int pos {Chooser(Diags, GameState)}; 
+            if (pos != 0)
             {
-                int pos {(rand() % 9 + 1)};
-
-                if (NewGameState.at(pos-1) == 'U')
-                {
-                    if (FirstMove == 1)
-                    {
-                        FirstMove = 2; 
-                        TrialStages.at(0) = pos;
-                        TrialStages.at(1) = 0; 
-                        Trials.push_back(TrialStages);
-                    }
-                    NewGameState.at(pos-1) = player2; 
-                    NewPlayer2Turns.at(pos-1) = 1;
-                    if (PlayerWon(NewPlayer2Turns))
-                    {
-                        GameOver = true;
-                        debug = debug + 1;              // DEBUG LINE
-                        Trials.at(i-1).at(1) = 1;
-                        break;
-                    }
-                    int count {0};
-                    for (auto x: NewGameState)
-                    {
-                        if (x == 'U')
-                        {
-                            count = count + 1; 
-                        }
-                    }
-                    if ( count != 0)
-                    {
-                        PlayerTurn = 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
+                return pos;
             }
-
-            if (PlayerTurn = 1)
-            {
-                int pos {rand() % 9 + 1};
-
-                if (NewGameState.at(pos-1) == 'U')
-                {
-                    NewGameState.at(pos-1) = player1;
-                    NewPlayer1Turns.at(pos-1) = 1; 
-                    if (PlayerWon(NewPlayer1Turns))
-                    {
-                        debug2 = debug2 + 1;            // DEBUG LINE
-                        GameOver = true;
-                        break;
-                    }
-                    int count {0};
-                    for (auto x: NewGameState)
-                    {
-                        if (x == 'U')
-                        {
-                            count = count + 1; 
-                        }
-                    }
-                    if ( count != 0)
-                    {
-                        PlayerTurn = 2;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-        } while (!GameOver);
-    }
-
-    cout << "debug: " << debug << endl; 
-    cout << "debug2: " << debug2 << endl; 
-
-    // Collect those first moves which led to a win
-    vector <int> BestMove {}; 
-    for (long long int i {0}; i < Trials.size(); i++)
-    {
-        if( Trials.at(i).at(1) == 1)
+        }
+        if (GameState.at(2) == player1)
         {
-            BestMove.push_back(Trials.at(i).at(0));
+            vector <int> Diags {2,5,6};
+            int pos {Chooser(Diags, GameState)}; 
+            if (pos != 0)
+            {
+                return pos;
+            }
+        }
+        if (GameState.at(7) == player1)
+        {
+            vector <int> Diags {4,5,8};
+            int pos {Chooser(Diags, GameState)}; 
+            if (pos != 0)
+            {
+                return pos;
+            }
+        }
+        if (GameState.at(8) == player1)
+        {
+            vector <int> Diags {5,6,8};
+            int pos {Chooser(Diags, GameState)}; 
+            if (pos != 0)
+            {
+                return pos;
+            }
         }
     }
 
-    if (BestMove.size() != 0)
+    if (Difficulty >= 2)
     {
-        cout << "Number of Best moves: " << BestMove.size() << endl;       // DEBUG LINE
-        // Find which first move that lead to a win appeared the most
-        vector <int> BestMoveFreq (9); 
-        for ( int i {1}; i <= 9; i++)
+        // Choose corners if available. 
+        vector <int> Corners {1,3,7,9};
+        int pos {Chooser(Corners, GameState)}; 
+        if (pos != 0)
         {
-            int count {0}; 
-            for (auto num: BestMove)
-            {
-                if (num == i)
-                {
-                    count = count + 1;
-                }
-            }
-            BestMoveFreq.at(i-1) = count;
-        } 
-
-        int BestPos {BestMoveFreq.at(0)};
-        for (auto num: BestMoveFreq)
-        {
-            if (num >= BestPos)
-            {
-                BestPos = num;
-            }
+            return pos;
         }
-        for ( int i {0}; i < 9; ++i)
+
+
+        // Choose Middle if Available
+        vector <int> Middle {2,4,5,6,8};
+        pos = Chooser(Middle, GameState);
+        if ( pos != 0)
         {
-            if (BestPos == BestMoveFreq.at(i))
-            {
-                return (i + 1);
-            }
+            return pos;
         }
     }
         
     return ((rand() % 9) + 1);
 
-
 }
 
 int GamePlay (const char player1, const char player2, const string name1, const string name2, const int Difficulty)
 {
-    int PlayerTurn {1}; 
+    srand(time(NULL));
+    int PlayerTurn {(rand() % 2) + 1}; 
     vector <int> Player1Turns (9); 
     vector <int> Player2Turns (9);
     vector <char> GameState {'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U'};
     bool GameOver {false}; 
     int winner {};
 
-
+    // Begin game loop
     do
     {
         if (PlayerTurn == 1)
