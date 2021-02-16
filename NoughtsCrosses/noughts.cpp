@@ -2,6 +2,8 @@
 
 #include <iostream> 
 #include <vector>
+#include <cstdlib>
+#include <ctime> 
 
 using namespace std;
 
@@ -27,12 +29,12 @@ int BeginPlay()
     { 
         cout << "1.........Single Player (Player vs AI)" << endl;
         cout << "2.........Two Players (Player1 vs Player2)" << endl; 
-        cout << "3.........Quit Game" << endl;
+        cout << "0.........Quit Game" << endl;
         cout << "===================================" << endl; 
         cout << "How many players: ";
         cin >> NumOfPlayers; 
 
-    } while (NumOfPlayers != 1 && NumOfPlayers != 2 && NumOfPlayers != 3);
+    } while (NumOfPlayers != 1 && NumOfPlayers != 2 && NumOfPlayers != 0);
     
     
     return NumOfPlayers;
