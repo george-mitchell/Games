@@ -16,6 +16,8 @@ long long int Exponent (const int base, const int expo)
     return result;
 }
 
+
+// Setup the game
 int BeginPlay()
 {
     cout << "\nNoughts and Crosses Game" << endl;
@@ -36,6 +38,8 @@ int BeginPlay()
     return NumOfPlayers;
 }
 
+
+// Function that displays the current game board
 void DisplayBoard (vector <char> turns)
 {
     cout << endl;
@@ -80,6 +84,8 @@ void DisplayBoard (vector <char> turns)
     cout << endl;
 }
 
+
+// Function that determines if a player has won
 bool PlayerWon (vector <int> PlayerTurns)
 {
     
@@ -119,6 +125,8 @@ bool PlayerWon (vector <int> PlayerTurns)
     return false;
 }
 
+
+// Function used by the AI to determine where it should move, given the current state. 
 int Chooser (vector <int> Spaces, vector <char> GameState)
 {
     srand(time(NULL));
@@ -153,9 +161,12 @@ int Chooser (vector <int> Spaces, vector <char> GameState)
     return 0;
 }
 
+
+// This is the AI decision for where to place its mark
 int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <char> GameState, const int Difficulty, const char player1, const char player2)
 {
     srand(time(NULL));
+
     // Win if possible
     vector <int> NewPlayer2Turns {Player2Turns}; 
     for (int i {1}; i <= 9; ++i)
@@ -207,7 +218,7 @@ int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <ch
                 return pos;
             }
         }
-        if (GameState.at(7) == player1)
+        if (GameState.at(6) == player1)
         {
             vector <int> Diags {4,5,8};
             int pos {Chooser(Diags, GameState)}; 
@@ -251,9 +262,13 @@ int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <ch
 
 }
 
+
+// Function that plays the game
 int GamePlay (const char player1, const char player2, const string name1, const string name2, const int Difficulty)
 {
     srand(time(NULL));
+
+    // Prepare gameplay trackers
     int PlayerTurn {(rand() % 2) + 1}; 
     vector <int> Player1Turns (9); 
     vector <int> Player2Turns (9);
@@ -358,6 +373,8 @@ int GamePlay (const char player1, const char player2, const string name1, const 
     
 }
 
+
+// Setting up the game with the number of players
 void Noughts (const int players) 
 {
     int winner {};
