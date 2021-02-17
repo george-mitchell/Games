@@ -286,6 +286,11 @@ int GamePlay (const char player1, const char player2, const string name1, const 
             int pos {};
             cout << name1 << ": ";
             cin >> pos; 
+            if (pos > 9 || pos < 1)
+            {
+                cout << "Please input a position 1-9" << endl; 
+                continue;
+            }
             if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
             {
                 Player1Turns.at(pos-1) = 1;
@@ -333,6 +338,11 @@ int GamePlay (const char player1, const char player2, const string name1, const 
             {
                 cout << name2 << ": ";
                 cin >> pos; 
+            }
+            if (pos > 9 || pos < 1)
+            {
+                cout << "Please input a position 1-9" << endl; 
+                continue;
             }
 
             if (Player1Turns.at(pos-1) == 0 && Player2Turns.at(pos-1) == 0)
