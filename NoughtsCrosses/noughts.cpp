@@ -430,8 +430,10 @@ void Noughts (const int players)
         cout << "Let's play!" << endl;
         cout << "=====================" << endl; 
 
+        // Play the game
         winner = GamePlay(player1, player2, name, "TuRiNg", Difficulty); 
 
+        // Display who won the game
         if (winner == 1)
         {
             cout << name << " is the winner!" << endl;
