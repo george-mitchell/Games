@@ -7,18 +7,6 @@
 
 using namespace std;
 
-long long int Exponent (const int base, const int expo)
-{
-    long long int result {1};
-    for(int i {1}; i <= expo; i++)
-    {
-        result = result * base; 
-    }
-
-    return result;
-}
-
-
 // Setup the game
 int BeginPlay()
 {
