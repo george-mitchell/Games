@@ -248,6 +248,7 @@ int AIDecision (vector <int> Player1Turns, vector <int> Player2Turns, vector <ch
         }
     }
         
+    // if no tactical moves are available then randomnly pick a move
     return ((rand() % 9) + 1);
 
 }
